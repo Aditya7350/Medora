@@ -38,10 +38,10 @@ export async function processPdf({ pdfFile, logoFile, footerFile }: ProcessPdfOp
 
         // Draw Logo at Top Right (or Left?) - Let's say Top Right for standard report
         if (logoImage) {
-            const logoDims = logoImage.scale(0.25);
+            const logoDims = logoImage.scale(0.2);
             page.drawImage(logoImage, {
-                x: 20, // Left aligned
-                y: height - logoDims.height - 15, // Top aligned
+                x: 10,
+                y: height - logoDims.height - 10,
                 width: logoDims.width,
                 height: logoDims.height,
             });
