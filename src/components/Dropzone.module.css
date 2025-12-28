@@ -1,0 +1,22 @@
+.dropzone {
+    border: 2px dashed hsla(var(--primary) / 0.5);
+    border-radius: var(--radius);
+    padding: 3rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: hsla(var(--card) / 0.3);
+    color: hsl(var(--muted-foreground));
+}
+
+.dropzone:hover,
+.active {
+    border-color: hsl(var(--primary));
+    background: hsla(var(--primary) / 0.1);
+    color: hsl(var(--primary));
+}
+
+.icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
