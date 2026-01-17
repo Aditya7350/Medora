@@ -35,7 +35,7 @@ export default function Dashboard() {
         pdfFile,
         logoBuffer,
         footerBuffer,
-        qrData: `https://verify.medora.health/${pdfFile.name}` // Example dynamic data
+        qrData: `https://verify.medora.health/${encodeURIComponent(pdfFile.name)}` // Encoded for safety
       });
 
       const blob = new Blob([processedBytes as BlobPart], { type: 'application/pdf' });

@@ -111,9 +111,14 @@ export async function processPdf({
             // Let's position it at x: 50, y: 150 for now (above where a typical footer might be).
             // Actually, safe bet is bottom right or left corner. Let's do bottom right.
 
+            // Top-left alignment logic
+            const leftMargin = 20;
+            const headerTopY = height - 150;
+            const topPadding = 10;
+
             page.drawImage(qrImage, {
-                x: width - qrSize - 50,
-                y: 100, // Fixed height from bottom for now
+                x: leftMargin,
+                y: headerTopY + topPadding,
                 width: qrSize,
                 height: qrSize
             });
