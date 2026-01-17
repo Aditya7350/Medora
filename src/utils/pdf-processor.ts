@@ -1,12 +1,17 @@
-import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+import { PDFDocument } from 'pdf-lib';
 
 interface ProcessPdfOptions {
     pdfFile: File;
-    logoFile?: File;
-    footerFile?: File;
+    logoBuffer?: ArrayBuffer;
+    footerBuffer?: ArrayBuffer;
 }
 
-export async function processPdf({ pdfFile, logoFile, footerFile }: ProcessPdfOptions): Promise<Uint8Array> {
+export async function processPdf({
+    pdfFile,
+    logoBuffer,
+    footerBuffer,
+}: ProcessPdfOptions): Promise<Uint8Array> {
+
     const pdfBytes = await pdfFile.arrayBuffer();
     const pdfDoc = await PDFDocument.load(pdfBytes);
     const pages = pdfDoc.getPages();
@@ -14,49 +19,64 @@ export async function processPdf({ pdfFile, logoFile, footerFile }: ProcessPdfOp
     let logoImage;
     let footerImage;
 
-    if (logoFile) {
-        const logoBytes = await logoFile.arrayBuffer();
-        // Try to embed PNG first, then JPG if fails (simplified for now, ideally check mime type)
+    if (logoBuffer) {
         try {
-            logoImage = await pdfDoc.embedPng(logoBytes);
+            logoImage = await pdfDoc.embedPng(logoBuffer);
         } catch {
-            logoImage = await pdfDoc.embedJpg(logoBytes);
+            logoImage = await pdfDoc.embedJpg(logoBuffer);
         }
     }
 
-    if (footerFile) {
-        const footerBytes = await footerFile.arrayBuffer();
+    if (footerBuffer) {
         try {
-            footerImage = await pdfDoc.embedPng(footerBytes);
+            footerImage = await pdfDoc.embedPng(footerBuffer);
         } catch {
-            footerImage = await pdfDoc.embedJpg(footerBytes);
+            footerImage = await pdfDoc.embedJpg(footerBuffer);
         }
     }
 
     for (const page of pages) {
         const { width, height } = page.getSize();
+        const HEADER_HEIGHT = 150;
 
-        // Draw Logo at Top Right (or Left?) - Let's say Top Right for standard report
+
         if (logoImage) {
-            const logoDims = logoImage.scale(0.2);
+            const margin = 1;
+            const headerTopPadding = 5;
+            const maxLogoWidth = 300;
+            const maxLogoHeight = 240;
+
+            const { width: imgW, height: imgH } = logoImage;
+
+            const scale = Math.min(
+                maxLogoWidth / imgW,
+                maxLogoHeight / imgH
+            );
+
+            const logoWidth = imgW * scale;
+            const logoHeight = imgH * scale;
+            const headerTopY = height - HEADER_HEIGHT;
             page.drawImage(logoImage, {
-                x: 10,
-                y: height - logoDims.height - 10,
-                width: logoDims.width,
-                height: logoDims.height,
+                x: width - logoWidth - margin,
+                // y: height - logoHeight - margin - headerTopPadding,
+                y: headerTopY + (HEADER_HEIGHT - logoHeight) / 2 + headerTopPadding,
+                width: logoWidth,
+                height: logoHeight,
             });
         }
 
-        // Draw Footer at Bottom Center
         if (footerImage) {
-            // Scale to fit width, maybe? Or keep original aspect ratio but small
-            // Let's assume full width footer or centered image
-            const footerDims = footerImage.scale(0.2);
+            const bottomMargin = 20;
+            const footerHeight = 850;
+
+            const scale = footerHeight / footerImage.height;
+            const footerWidth = footerImage.width * scale;
+
             page.drawImage(footerImage, {
-                x: (width - footerDims.width) / 2,
-                y: 20,
-                width: footerDims.width,
-                height: footerDims.height,
+                x: (width - footerWidth) / 2,
+                y: bottomMargin,
+                width: footerWidth,
+                height: footerHeight,
             });
         }
     }
