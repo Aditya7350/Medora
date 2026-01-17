@@ -9,11 +9,13 @@ import { useState, useEffect } from 'react';
 export default function Dashboard() {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [processedPdfUrl, setProcessedPdfUrl] = useState<string | null>(null);
+  const [outputFileName, setOutputFileName] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState(false);
 
   // Auto-process when pdfFile changes
   useEffect(() => {
     if (pdfFile) {
+      setOutputFileName(pdfFile.name);
       handleProcess();
     }
   }, [pdfFile]);
@@ -51,14 +53,14 @@ export default function Dashboard() {
 
     // Fetch blob again to share file
     const blob = await fetch(processedPdfUrl).then(r => r.blob());
-    const file = new File([blob], "patient-report.pdf", { type: 'application/pdf' });
+    const file = new File([blob], outputFileName || "patient-report.pdf", { type: 'application/pdf' });
 
     if (navigator.share) {
       try {
         await navigator.share({
           files: [file],
-          title: 'Patient Report',
-          text: 'Here is the processed patient report.'
+          title: outputFileName || 'Patient Report',
+          // text: 'Here is the processed patient report.'
         });
       } catch (err) {
         console.log("Share failed or canceled", err);
@@ -78,8 +80,16 @@ export default function Dashboard() {
         <div className="glass-panel" style={{ padding: '1rem 2rem', width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h1 className={styles.title}>Patient Report System</h1>
           {processedPdfUrl && (
-            <div style={{ display: 'flex', gap: '1rem' }}>
-              <a href={processedPdfUrl} download="patient_report_processed.pdf" className={styles.button}>
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+              <input
+                type="text"
+                value={outputFileName}
+                onChange={(e) => setOutputFileName(e.target.value)}
+                className={styles.input}
+                style={{ padding: '0.5rem', borderRadius: '0.25rem', border: '1px solid #ccc', marginRight: '0.5rem' }}
+                placeholder="Filename"
+              />
+              <a href={processedPdfUrl} download={outputFileName || "patient_report_processed.pdf"} className={styles.button}>
                 Download
               </a>
               <button onClick={handleShare} className={`${styles.button} ${styles.primary}`}>
@@ -108,7 +118,7 @@ export default function Dashboard() {
             <div className="glass-panel" style={{ height: '100%', minHeight: '600px', display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1rem' }}>
               <div className={styles.previewHeader}>
                 <h3>{pdfFile.name}</h3>
-                <button onClick={() => { setPdfFile(null); setProcessedPdfUrl(null); }} className={styles.textBtn}>Start Over</button>
+                <button onClick={() => { setPdfFile(null); setProcessedPdfUrl(null); setOutputFileName(''); }} className={styles.textBtn}>Start Over</button>
               </div>
 
               {processedPdfUrl ? (
