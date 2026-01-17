@@ -91,34 +91,17 @@ export async function processPdf({
         }
 
         if (qrImage) {
-            const qrSize = 100;
-            const qrPadding = 10;
-            // Position above footer. 
-            // NOTE: It seems footerHeight (850) is very large in previous code, possibly scaled down? 
-            // Looking at previous code: `footerHeight = 850` and `y: bottomMargin` (20).
-            // This suggests the footer is huge? Or maybe the user meant width?
-            // Re-reading previous code: `footerHeight = 850`. That seems wrong for a footer height unless the image is massive and scaled?
-            // Wait, previous code: `const scale = footerHeight / footerImage.height; const footerWidth = footerImage.width * scale;`
-            // It sets DRAW height to 850. That's almost the whole page (A4 is ~842 pts).
-            // This looks suspicious. `footerImage` drawing y is 20. height is 850.
-            // If the footer is a full page background or watermark, this makes sense.
-            // If it's just a bottom footer, 850 is way too big. 
-            // Let's assume the previous code works as the user wanted (maybe it's a letterhead background?).
-            // For QR code above footer, if footer covers the page, we should probably place it at the bottom but arguably visible.
-            // If footer is truly a footer, 850 height is weird.
-            // I'll assume for now to place it at the bottom right or left, slightly above the absolute bottom margin if the footer is indeed a background.
-            // OR if the footer is a small bar, I'll place it above.
-            // Let's position it at x: 50, y: 150 for now (above where a typical footer might be).
-            // Actually, safe bet is bottom right or left corner. Let's do bottom right.
-
-            // Top-left alignment logic
+            const qrSize = 70;
             const leftMargin = 20;
+            // Header area is 150px tall, starting at height - 150
             const headerTopY = height - 150;
-            const topPadding = 10;
+
+            // Center vertically: (150 - 70) / 2 = 40
+            const centeredPadding = (150 - qrSize) / 2;
 
             page.drawImage(qrImage, {
                 x: leftMargin,
-                y: headerTopY + topPadding,
+                y: headerTopY + centeredPadding,
                 width: qrSize,
                 height: qrSize
             });
