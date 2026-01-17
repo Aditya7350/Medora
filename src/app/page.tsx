@@ -34,7 +34,8 @@ export default function Dashboard() {
       const processedBytes = await processPdf({
         pdfFile,
         logoBuffer,
-        footerBuffer
+        footerBuffer,
+        qrData: `https://verify.medora.health/${pdfFile.name}` // Example dynamic data
       });
 
       const blob = new Blob([processedBytes as BlobPart], { type: 'application/pdf' });
