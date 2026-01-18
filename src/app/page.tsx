@@ -90,16 +90,32 @@ export default function Dashboard() {
                 style={{ padding: '0.5rem', borderRadius: '0.25rem', border: '1px solid #ccc', marginRight: '0.5rem' }}
                 placeholder="Filename"
               />
-              <a href={processedPdfUrl} download={outputFileName || "patient_report_processed.pdf"} className={styles.button}>
-                Download
-              </a>
-              <button onClick={handleShare} className={`${styles.button} ${styles.primary}`}>
-                Share via WhatsApp
-              </button>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.25rem' }}>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                  <a href={processedPdfUrl} download={outputFileName || "patient_report_processed.pdf"} className={styles.button}>
+                    Download
+                  </a>
+                  <button onClick={handleShare} className={`${styles.button} ${styles.primary}`}>
+                    Share via WhatsApp
+                  </button>
+                </div>
+                {/* Debug/Verification Link */}
+                <div style={{ fontSize: '0.75rem', color: 'hsl(var(--muted-foreground))', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                  <span>QR Link: https://verify.medora.health/{encodeURIComponent(outputFileName || pdfFile?.name || "")}</span>
+                  <a
+                    href={`https://verify.medora.health/${encodeURIComponent(outputFileName || pdfFile?.name || "")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ textDecoration: 'underline', color: 'blue' }}
+                  >
+                    Test Link
+                  </a>
+                </div>
+              </div>
             </div>
           )}
         </div>
-      </header>
+      </header >
 
       <div className={styles.content}>
         <main className={styles.mainArea} style={{ width: '100%', maxWidth: '1000px', margin: '0 auto' }}>
@@ -134,6 +150,6 @@ export default function Dashboard() {
           )}
         </main>
       </div>
-    </div>
+    </div >
   );
 }

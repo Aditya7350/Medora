@@ -92,9 +92,9 @@ export async function processPdf({
 
         if (qrImage) {
             const qrSize = 70;
-            const leftMargin = 20;
+            const leftMargin = 30;
             // Header area is 150px tall, starting at height - 150
-            const headerTopY = height - 150;
+            const headerTopY = height - 130;
 
             // Center vertically: (150 - 70) / 2 = 40
             const centeredPadding = (150 - qrSize) / 2;
